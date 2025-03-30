@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publicações</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.1/gsap.min.js"></script>
+  <style>
+    body {
+      background-color: #1a1a1a;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #studyTaskName {
+      text-align: center;
+      font-size: 3rem;
+      margin-bottom: 30px;
+      font-weight: normal;
+      background: linear-gradient(45deg, #ff00aa, #00aaff, #32cd32);
+      -webkit-background-clip: text;
+      color: transparent;
+      background-size: 400% 400%;
+      animation: gradientAnimation 6s ease infinite;
+    }
+
+    @keyframes gradientAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .post {
+      background-color: rgba(34, 34, 34, 0.9);
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 15px;
+      max-width: 600px;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .post:hover {
+      transform: scale(1.02);
+    }
+
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      overflow-y: hidden;
+      gap: 15px;
+      padding: 10px;
+      scroll-snap-type: x mandatory;
+    }
+
+    .carousel img {
+      width: 100%;
+      max-height: 250px;
+      border-radius: 15px;
+      scroll-snap-align: center;
+      border: 2px solid transparent;
+      transition: border 0.3s ease;
+      cursor: pointer;
+    }
+
+    .carousel img:hover {
+      border: 2px solid #ff00aa;
+    }
+
+    .comment {
+      background-color: #333;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+
+    .icon-container {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .icon-container img {
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .icon-container img:hover {
+      transform: scale(1.1);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background-color: #444;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: none;
+      font-size: 1.2rem;
+      max-width: 90%;
+      color: white;
+      position: relative;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+
+    .carousel-indicators {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ccc;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+
+    .active {
+      background-color: #ff00aa;
+    }
+
+    @media (max-width: 768px) {
+      #studyTaskName {
+        font-size: 2rem;
+      }
+
+      .post {
+        max-width: 90%;
+      }
+
+      .modal-content {
+        font-size: 1rem;
+        width: 80%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 id="studyTaskName">StudyTask</h1>
+  <div id="postsContainer"></div>
+
+  <div id="likeModal" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()">×</button>
+      Obrigado por ter curtido essa atividade! O administrador ficou muito feliz.
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmUg09R5bl1pEkkctQ0cvocljlQAhL01E",
+      authDomain: "studytaskbr.firebaseapp.com",
+      projectId: "studytaskbr",
+      storageBucket: "studytaskbr.firebasestorage.app",
+      messagingSenderId: "225191732377",
+      appId: "1:225191732377:web:f0f4a01cd8afbd64460408",
+      measurementId: "G-65G0CNWFDJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadPosts() {
+      // Ordenar as publicações por data em ordem decrescente
+      const postsQuery = query(collection(db, "natureza"), orderBy("date", "desc"));
+      const querySnapshot = await getDocs(postsQuery);
+      const container = document.getElementById("postsContainer");
+      container.innerHTML = "";
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const postDiv = document.createElement("div");
+        postDiv.className = "post";
+
+        const commentDiv = document.createElement("div");
+        commentDiv.className = "comment";
+        commentDiv.textContent = data.comment;
+
+        const carousel = document.createElement("div");
+        carousel.className = "carousel";
+
+        data.images.forEach((imgUrl) => {
+          const img = document.createElement("img");
+          img.src = imgUrl;
+          img.onclick = () => {
+            window.location.href = `visualizacao.html?img=${encodeURIComponent(imgUrl)}`;
+          };
+          carousel.appendChild(img);
+        });
+
+        const iconContainer = document.createElement("div");
+        iconContainer.className = "icon-container";
+
+        const downloadIcon = document.createElement("img");
+        downloadIcon.src = "download-icon.png";
+        downloadIcon.alt = "Download";
+        downloadIcon.onclick = () => forceDownload(data.images);
+
+        const likeIcon = document.createElement("img");
+        likeIcon.src = "like-icon.png";
+        likeIcon.alt = "Curtir";
+        likeIcon.onclick = openModal;
+
+        iconContainer.appendChild(downloadIcon);
+        iconContainer.appendChild(likeIcon);
+
+        postDiv.appendChild(commentDiv);
+        postDiv.appendChild(carousel);
+        postDiv.appendChild(iconContainer);
+        container.appendChild(postDiv);
+
+        const indicatorsContainer = document.createElement('div');
+        indicatorsContainer.className = 'carousel-indicators';
+        data.images.forEach((_, index) => {
+          const indicator = document.createElement('div');
+          indicator.className = 'indicator';
+          indicator.dataset.index = index;
+          indicator.onclick = () => {
+            carousel.scrollTo({
+              left: img.clientWidth * index,
+              behavior: 'smooth'
+            });
+            updateIndicators(indicatorsContainer, index);
+          };
+          indicatorsContainer.appendChild(indicator);
+        });
+        postDiv.appendChild(indicatorsContainer);
+        updateIndicators(indicatorsContainer, 0);
+      });
+
+      gsap.to("#studyTaskName", {
+        duration: 10,
+        backgroundPosition: "400% 0%",
+        repeat: -1,
+        ease: "linear"
+      });
+    }
+
+    function updateIndicators(indicatorsContainer, activeIndex) {
+      const indicators = indicatorsContainer.children;
+      for (let i = 0; i < indicators.length; i++) {
+        indicators[i].classList.remove('active');
+      }
+      indicators[activeIndex].classList.add('active');
+    }
+
+    function forceDownload(images) {
+      images.forEach(imgUrl => {
+        fetch(imgUrl)
+          .then(response => response.blob())
+          .then(blob => {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = imgUrl.substring(imgUrl.lastIndexOf("/") + 1);
+            link.click();
+          })
+          .catch(error => console.error('Erro ao baixar a imagem:', error));
+      });
+    }
+
+    function openModal() {
+      const modal = document.getElementById("likeModal");
+      modal.style.display = "flex";
+
+      gsap.to(modal, { opacity: 1, duration: 0.3 });
+
+      setTimeout(closeModal, 2000);
+    }
+
+    function closeModal() {
+      const modal = document.getElementById("likeModal");
+      gsap.to(modal, { opacity: 0, duration: 0.3, onComplete: () => modal.style.display = "none" });
+    }
+
+    window.onload = loadPosts;
+  </script>
+</body>
+</html>

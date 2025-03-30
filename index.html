@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atividades</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        .btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 10px;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+        .btn img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
+        }
+        .btn:hover {
+            background-color: #555;
+            transform: scale(1.1);
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Animação de entrada rápida e simples
+            gsap.from(".btn", {
+                duration: 0.5, // Reduzindo a duração para uma entrada mais rápida
+                opacity: 0,
+                y: 20,
+                stagger: 0.05, // Reduzindo o intervalo de animação
+                ease: "power1.out"
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <a href="matematica.html" class="btn"><img src="ic_matematica.png" alt="">Matemática</a>
+        <a href="matematica_rabelo.html" class="btn"><img src="ic_matematica.png" alt="">Matemática (Rabelo)</a>
+        <a href="portugues.html" class="btn"><img src="ic_portugues.png" alt="">Português</a>
+        <a href="redacao.html" class="btn"><img src="ic_redação.png" alt="">Redação</a>
+        <a href="linguagens_codigos.html" class="btn"><img src="ic_portugues2.png" alt="">Linguagens e Códigos</a>
+        <a href="ciencias_natureza.html" class="btn"><img src="natureza.png" alt="">Ciências da Natureza</a>
+        <a href="ciencias_humanas.html" class="btn"><img src="humanas.png" alt="">Ciências Humanas</a>
+        <a href="Ed.fisica.html" class="btn"><img src="Ed.fisica.png" alt="">Educação Física</a>
+        <a href="fisica.html" class="btn"><img src="ic_fisica.png" alt="">Física</a>
+        <a href="quimica.html" class="btn"><img src="ic_quimica.png" alt="">Química</a>
+        <a href="biologia.html" class="btn"><img src="ic_biologia.png" alt="">Biologia</a>
+        <a href="historia.html" class="btn"><img src="ic_historia.png" alt="">História</a>
+        <a href="geografia.html" class="btn"><img src="ic_geografia.png" alt="">Geografia</a>
+        <a href="filosofia.html" class="btn"><img src="philosopher.png" alt="">Filosofia</a>
+        <a href="sociologia.html" class="btn"><img src="ic_sociologia.png" alt="">Sociologia</a>
+        <a href="ingles.html" class="btn"><img src="ingles.png" alt="">Inglês</a>
+    </div>
+</body>
+</html>
